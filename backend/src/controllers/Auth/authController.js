@@ -3,9 +3,8 @@ import User from "../../models/userModel.js";
 import { tryCatch } from "../../utils/tryCatch.js";
 import bcryptjs from "bcryptjs";
 
-// ---------------- SIGNUP ----------------
 export const signUp = tryCatch(async (req, res) => {
-    const { fullname, email, password, mobile } = req.body;
+    const { fullname, email, password, mobile, roles } = req.body;
 
     // Check missing input
     if (!fullname || !email || !password) {
@@ -35,24 +34,22 @@ export const signUp = tryCatch(async (req, res) => {
     // Hashing password
     const hashedPassword = await bcryptjs.hash(password, 10);
 
-    // Create new user
     const user = await User.create({
         fullname,
         email,
         password: hashedPassword,
         mobile,
+        roles
     });
 
     // Generate token
-    const token = generateToken(user._id);
-
+    const token = await generateToken(user._id);
     res.cookie("token", token, {
         secure: false,
         sameSite: "strict",
         maxAge: 15 * 24 * 60 * 60 * 1000,
         httpOnly: true
     });
-
     return res.status(201).json({
         status: true,
         message: "Your account was created successfully",
@@ -61,11 +58,8 @@ export const signUp = tryCatch(async (req, res) => {
     });
 });
 
-
-// ---------------- SIGNIN ----------------
 export const signIn = tryCatch(async (req, res) => {
     const { email, password } = req.body;
-
     // Validate inputs
     if (!email) {
         return res.status(400).json({
@@ -73,14 +67,12 @@ export const signIn = tryCatch(async (req, res) => {
             message: "Please enter email address"
         });
     }
-
     if (!password) {
         return res.status(400).json({
             status: false,
             message: "Please enter password"
         });
     }
-
     // Check user exists
     const userInfo = await User.findOne({ email });
     if (!userInfo) {
@@ -89,7 +81,6 @@ export const signIn = tryCatch(async (req, res) => {
             message: "No account found with this email"
         });
     }
-
     // Check password
     const passMatched = await bcryptjs.compare(password, userInfo.password);
     if (!passMatched) {
@@ -101,14 +92,12 @@ export const signIn = tryCatch(async (req, res) => {
 
     // Generate token
     const token = generateToken(userInfo._id);
-
     res.cookie("token", token, {
         secure: false,
         sameSite: "strict",
         maxAge: 15 * 24 * 60 * 60 * 1000,
         httpOnly: true
     });
-
     return res.status(200).json({
         status: true,
         message: "User logged in successfully",
@@ -116,8 +105,6 @@ export const signIn = tryCatch(async (req, res) => {
     });
 });
 
-
-// ---------------- SIGNOUT ----------------
 export const signOut = tryCatch(async (req, res) => {
     res.cookie("token", "", {
         httpOnly: true,

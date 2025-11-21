@@ -45,11 +45,20 @@ const UserSchema = new mongoose.Schema(
         message: "Mobile number must be 10 digits"
       }
     },
-
     roles: {
       type: String,
       enum: ["user", "owner", "delivery"],
       required: [true, "Role is required"]
+    },
+    resetOtp:{
+      type:String
+    },
+    isOtpVerified:{
+      type:Boolean,
+      default:false
+    },
+    otpExpires:{
+      type:Date,
     }
   },
   { timestamps: true }
