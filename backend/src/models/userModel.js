@@ -23,16 +23,15 @@ const UserSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
-      validate: {
-        validator: function (v) {
-          // At least 1 lowercase, 1 uppercase, 1 number
-          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(v);
-        },
-        message:
-          "Password must contain uppercase, lowercase, number and be 6+ chars"
-      }
+      // required: [true, "Password is required"],
+      // minlength: [6, "Password must be at least 6 characters"],
+      // validate: {
+      //   validator: function (v) {
+      //     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(v);
+      //   },
+      //   message:
+      //     "Password must contain uppercase, lowercase, number and be 6+ chars"
+      // }
     },
 
     mobile: {

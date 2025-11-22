@@ -2,7 +2,7 @@ import {Routes,Route} from 'react-router-dom'
 import SignUp from './pages/Signup'
 import SignIn from './pages/SignIn'
 import ForgotPassword from './pages/ForgotPassword';
-export const userServiceUrl='http://localhost:3000';
+export const userServiceUrl='http://localhost:5000';
 function App() {
   return (
     <Routes>

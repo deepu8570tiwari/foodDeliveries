@@ -11,6 +11,7 @@ function ForgotPassword() {
   const [otp, setOtp]=useState("");
   const [newpassword, setNewpassword]=useState("");
   const [confirmpassword, setConfirmpassword]=useState("");
+  const [error,setError]=useState("");
   const navigate=useNavigate();
   const handleSendOtp=async()=>{
     try {
@@ -18,9 +19,11 @@ function ForgotPassword() {
         {withCredentials:true}
     )
     console.log("is message send", result);
+    setError("");
     setStep(2);
     } catch (error) {
-      console.log(error);
+      const msg = error?.response?.data?.message || "Something went wrong";
+      setError(msg);
     }
   }
   const verifyOtp=async()=>{
@@ -29,9 +32,11 @@ function ForgotPassword() {
         {withCredentials:true}
     )
     console.log("is message send", result);
+    setError("");
     setStep(3);
     } catch (error) {
-      console.log(error);
+      const msg = error?.response?.data?.message || "Something went wrong";
+      setError(msg);
     }
   }
   const resetPassword=async()=>{
@@ -43,9 +48,11 @@ function ForgotPassword() {
         {withCredentials:true}
     )
     console.log("is message send", result);
+    setError("");
     navigate("/signin");
     } catch (error) {
-      console.log(error);
+      const msg = error?.response?.data?.message || "Something went wrong";
+      setError(msg);
     }
   }
   return (
@@ -74,6 +81,7 @@ function ForgotPassword() {
                     className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                     placeholder="Enter Your Email Address"
                     style={{ border: `1px solid ${borderColor}` }}
+                    required
                   />
               
               </div>
@@ -81,6 +89,7 @@ function ForgotPassword() {
                   onClick={handleSendOtp}>
                   Send OTP
                 </button>
+                {error && <p className="text-red-500 mt-2">{error}</p>}
             </div>
           )
         }
@@ -101,6 +110,7 @@ function ForgotPassword() {
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                   placeholder="Enter Your OTP"
                   style={{ border: `1px solid ${borderColor}` }}
+                  required
                 />
               </div>
               <button 
@@ -109,6 +119,7 @@ function ForgotPassword() {
                 >
                   Verify OTP
               </button>
+              {error && <p className="text-red-500 mt-2">{error}</p>}
           </div>
           )
         }
@@ -129,6 +140,7 @@ function ForgotPassword() {
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                   placeholder="Enter Your New Password"
                   style={{ border: `1px solid ${borderColor}` }}
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -145,11 +157,13 @@ function ForgotPassword() {
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none"
                   placeholder="Confirm Password"
                   style={{ border: `1px solid ${borderColor}` }}
+                  required
                 />
               </div>
             <button className="w-full mt-4 font-semibold rounded-lg py-2 transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer"
                   onClick={resetPassword}>Reset Your Password
             </button>
+            {error && <p className="text-red-500 mt-2">{error}</p>}
           </div>
           )
         }
