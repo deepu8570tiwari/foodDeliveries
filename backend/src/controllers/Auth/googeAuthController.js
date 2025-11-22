@@ -3,7 +3,7 @@ import User from "../../models/userModel.js"
 import { generateToken } from "../../middleware/generateToken.js";
 export const googleAuthSignUp=tryCatch(async(req,res)=>{
     const {fullname,email, mobile, roles}=req.body;
-    const user=await User.findOne({email});
+    let user=await User.findOne({email});
     if(!user){
         user= await User.create({
             fullname,email,mobile, roles

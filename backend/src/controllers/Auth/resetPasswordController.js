@@ -4,6 +4,12 @@ import {sentOTPEmail} from "../../utils/mailer.js"
 import bcryptjs from "bcryptjs";
 export const sendOTP=tryCatch(async(req,res)=>{
     const {email}=req.body;
+    if(!email){
+         return res.status(400).json({
+            status: false,
+            message: "Please Enter Email"
+        });
+    }
     const user= await User.findOne({email});
     if(!user){
         return res.status(400).json({

@@ -7,6 +7,8 @@ import { userServiceUrl } from '../App';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { ClipLoader } from "react-spinners"
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice';
 function SignUp() {
     const primaryColor='#ff4d2d';
     const hoverColor='#e64323';
@@ -21,6 +23,7 @@ function SignUp() {
     const [mobile, setMobile]=useState("");
     const [error,setError]=useState("")
     const [loading, setLoading]=useState(false);
+    const dispatch=useDispatch();
     const handleSignUp=async()=>{
         setLoading(true);
         try {
@@ -30,6 +33,8 @@ function SignUp() {
                 {withCredentials:true}
             )
             console.log(result);
+            dispatch(setUserData(result.data.data));
+            setError("");
             setLoading(false);
         } catch (error) {
             console.log("error",error);
@@ -54,11 +59,11 @@ function SignUp() {
                 {withCredentials:true}
             )
             console.log(data);
+            dispatch(setUserData(data.data));
             setError("");
         } catch (error) {
             console.log("error",error);
         }
-        console.log(result);
     }
   return (
     <div className='min-h-screen w-full flex items-center justify-center p-4' style={{backgroundColor:bgColor}}>
