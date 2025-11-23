@@ -7,7 +7,7 @@ import { userServiceUrl } from '../App';
 import { setMyShopData } from '../redux/ownerSlice';
 import axios from 'axios';
 
-function CreateEditOwnerShop() {
+function AddOwnerShop() {
   const navigate=useNavigate();
   const {myShopData}=useSelector(state=>state.owner);
   console.log("myshopData",myShopData)
@@ -102,4 +102,4 @@ function CreateEditOwnerShop() {
   )
 }
 
-export default CreateEditOwnerShop
+export default AddOwnerShop
