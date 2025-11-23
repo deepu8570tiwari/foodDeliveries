@@ -7,6 +7,8 @@ import authRouter from "./routes/Auth/authRouter.js";
 import resetRouter from "./routes/Auth/resetPassword.js";
 import googleRouter from "./routes/Auth/googleRouter.js";
 import userRouter from "./routes/Users/userRouter.js";
+import shopRouter from "./routes/ShopOwner/shopOwner.js";
+import itemsRouter from "./routes/ShopOwner/itemList.js";
 dotenv.config();
 const app=express();
 app.use(cors({
@@ -22,6 +24,8 @@ app.use("/api/v1",authRouter);
 app.use("/api/v1",resetRouter);
 app.use("/api/v1",googleRouter);
 app.use("/api/v1",userRouter);
+app.use("/api/v1",shopRouter);
+app.use("/api/v1",itemsRouter);
 app.listen(port,async()=>{
     console.log(`Server is running on ${port}`);
     await connectDB();
