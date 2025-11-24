@@ -32,12 +32,10 @@ function SignUp() {
                 fullname, email,password,mobile, roles:role},
                 {withCredentials:true}
             )
-            console.log(result);
             dispatch(setUserData(result.data.data));
             setError("");
             setLoading(false);
         } catch (error) {
-            console.log("error",error);
             const msg = error?.response?.data?.message || "Something went wrong";
             setError(msg);
             setLoading(false);
@@ -52,13 +50,11 @@ function SignUp() {
         const provider=new GoogleAuthProvider();
         const result=await signInWithPopup(auth,provider);
         try {
-            console.log(`${userServiceUrl}/api/v1/google-auth/signup`);
             const {data}= await axios.post(
                 `${userServiceUrl}/api/v1/google-auth/signup`,{
                 fullname:result.user.displayName, email:result.user.email,mobile, roles:role},
                 {withCredentials:true}
             )
-            console.log(data);
             dispatch(setUserData(data.data));
             setError("");
         } catch (error) {

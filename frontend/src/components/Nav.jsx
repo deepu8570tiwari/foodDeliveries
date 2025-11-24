@@ -9,6 +9,7 @@ import { setMyShopData } from '../redux/ownerSlice';
 import axios from 'axios';
 import { FaPlus } from "react-icons/fa";
 import { TbReceipt2 } from "react-icons/tb";
+import { useNavigate } from 'react-router-dom';
 
 
 function Nav() {
@@ -18,6 +19,7 @@ function Nav() {
   const [showDesktopSearch, setShowDesktopSearch] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const dispatch=useDispatch();
+  const navigate=useNavigate();
   const handleLogout=async()=>{
     try {
       const result=await axios.get(`${userServiceUrl}/api/v1/signout`,
@@ -108,15 +110,16 @@ function Nav() {
         }
         {userData.data.roles=="owner" ?<>
           {myShopData && <>
-          <button className='hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]'>
+          <button onClick={()=>navigate("/add-items")} className='hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]'>
           <FaPlus size={20}/>
           <span>Add Food Items</span>
           </button>
-          <button className='md:hidden flex items-center p-2 cursor-pointer  rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]'>
+          <button onClick={()=>navigate("/add-items")} className='md:hidden flex items-center p-2 cursor-pointer  rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]'>
           <FaPlus size={20}/>
           </button>
           
           </>}
+
           <div className='hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
             <TbReceipt2 size={20}/>
             <span>My Orders</span>
@@ -153,10 +156,12 @@ function Nav() {
             <div className="text-[17px] font-semibold">
               {userData?.data.fullname}
             </div>
-
-            <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
+            {userData?.data.roles=="user" && (
+              <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
               My Orders
             </div>
+            )}
+            
 
             <div className="text-[17px] text-[#ff4d2d] font-semibold cursor-pointer" onClick={handleLogout}>
               Log Out

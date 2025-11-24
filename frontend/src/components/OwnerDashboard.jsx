@@ -1,14 +1,15 @@
 import React from 'react';
 import Nav from "../components/Nav";
-import { useSelector } from 'react-redux';
+import {useDispatch, useSelector } from 'react-redux';
 import { FaPen, FaUtensils } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
-
+import { setMyShopData } from '../redux/ownerSlice';
+import OwnerItemCard from './OwnerItemCard';
 function OwnerDashboard() {
   const { myShopData } = useSelector(state => state.owner);
   const navigate = useNavigate();  // <-- Corrected
-  console.log("myShopData", myShopData);
-
+  const dispatch=useDispatch();
+  
   return (
     <div className="w-full min-h-screen bg-[#fff9f6] flex flex-col items-center">
       <Nav/>
@@ -55,31 +56,41 @@ function OwnerDashboard() {
               <p className='text-gray-500'>{myShopData.address}</p>
             </div>
           </div>
+          {myShopData.items.length==0 && 
+            <div className="flex justify-center items-center p-4 sm:p-6 w-full">
+              <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <FaUtensils className="text-[#ff4d2d] w-16 h-16 sm:w-20 sm:h-20 mb-4" />
+
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
+                    Add your Food Items
+                  </h2>
+
+                  <p className="text-gray-600 mb-4 text-sm sm:text-base">
+                    Share your delicious items with our customer by adding them into Menu.
+                  </p>
+
+                  <button
+                    onClick={() => navigate("/add-items")}
+                    className="bg-[#ff4d2d] cursor-pointer text-white px-8 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200"
+                  >
+                    Add Menu
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          }
+          {myShopData.items.length>0 && 
+            <div className='flex flex-col items-center gap-4 w-full max-w-3xl'>
+              {myShopData.items.map((items,index)=>(
+                <OwnerItemCard data={items} key={index}/>
+              ))}
+            </div>
+          }
         </div>
       }
-      {myShopData.items.length==0 && <div className="flex justify-center items-center p-4 sm:p-6 w-full">
-          <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="flex flex-col items-center text-center">
-              <FaUtensils className="text-[#ff4d2d] w-16 h-16 sm:w-20 sm:h-20 mb-4" />
-
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">
-                Add your Food Items
-              </h2>
-
-              <p className="text-gray-600 mb-4 text-sm sm:text-base">
-                Share your delicious items with our customer by adding them into Menu.
-              </p>
-
-              <button
-                onClick={() => navigate("/add-items")}
-                className="bg-[#ff4d2d] cursor-pointer text-white px-8 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200"
-              >
-                Add Menu
-              </button>
-
-            </div>
-          </div>
-        </div>}
+      
     </div>
   );
 }

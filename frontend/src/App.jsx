@@ -10,11 +10,14 @@ import useGetMyShop from '../hooks/useGetMyShop';
 import CreateEditOwnerShop from './pages/AddOwnerShop';
 import AddItems from './pages/AddItems';
 import EditOwnerShop from './pages/EditOwnerShop';
+import EditItems from './pages/EditItems';
+import useGetShopByCity from '../hooks/useGetShopByCity';
 export const userServiceUrl='http://localhost:5000';
 function App() {
   useGetCurrentUser();
   useGetCity();
   useGetMyShop();
+  useGetShopByCity();
   const {userData}=useSelector(state=>state.user);
   return (
     <Routes>
@@ -25,6 +28,7 @@ function App() {
       <Route path="/create-shop" element={userData ? <CreateEditOwnerShop/>: <Navigate to={"/signin"}/>}/>
       <Route path="/edit-shop" element={userData ? <EditOwnerShop/>: <Navigate to={"/signin"}/>}/>
       <Route path="/add-items" element={userData ? <AddItems/>: <Navigate to={"/signin"}/>}/>
+      <Route path="/edit-items/:itemId" element={userData ? <EditItems/>: <Navigate to={"/signin"}/>}/>
     </Routes>
   )
 }

@@ -34,3 +34,6 @@ export const uploadToCloudinary = (fileBuffer, folder = "productFiles") => {
     streamifier.createReadStream(fileBuffer).pipe(uploadStream);
   });
 };
+export const deleteFromCloudinary = async (publicId) => {
+  return await cloudinary.uploader.destroy(publicId);
+};

@@ -21,7 +21,6 @@ function ForgotPassword() {
       const result=await axios.post(`${userServiceUrl}/api/v1/send-otp`,{email},
         {withCredentials:true}
     )
-    console.log("is message send", result);
     setError("");
     setStep(2);
     setLoading(false);

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setCity, setState, setUserData,setAddress } from '../src/redux/userSlice';
 
 function useGetCity() {
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
   const api_key = import.meta.env.VITE_GEO_API_KEY;
 

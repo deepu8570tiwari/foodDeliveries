@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { userServiceUrl } from '../App';
 import { setMyShopData } from '../redux/ownerSlice';
 import axios from 'axios';
+import { ClipLoader } from 'react-spinners';
 
 function EditOwnerShop() {
   const navigate=useNavigate();
@@ -18,6 +19,7 @@ function EditOwnerShop() {
   const [userstate,setUserState]=useState(myShopData?.state || state);
   const [shopimage,setShopImage]=useState(myShopData?.image || null);
   const [sentimage,setSentImage]=useState(null);
+  const [loading,setLoading]=useState(false);
   const dispatch = useDispatch();
   const handleImage=(e)=>{
     const file=e.target.files[0];
@@ -26,7 +28,7 @@ function EditOwnerShop() {
   }
   const handleSubmit=async(e)=>{
     e.preventDefault();
-    
+    setLoading(true);
     try {
       const formData=new FormData();
       formData.append("name", name);
@@ -45,10 +47,11 @@ function EditOwnerShop() {
           withCredentials: true
         }
       );
-      console.log(result.data);
       dispatch(setMyShopData(result.data));
+      setLoading(false);
     } catch (error) {
-      
+      console.log(error);
+      setLoading(false);
     }
   }
   return (
@@ -94,7 +97,7 @@ function EditOwnerShop() {
               <label className='block text-sm font-medium text-gray-700 mb-1'>Address</label>
               <input type="text" placeholder='Enter Shop Address' onChange={(e)=>setUserAddress(e.target.value)}  value={useraddress} className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-orange-500'/>
             </div>
-            <button type="submit" className='w-full cursor-pointer bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all'>Save</button>
+            <button type="submit" className='w-full cursor-pointer bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all'disabled={loading}>{loading ? <ClipLoader size={20} className='text-white'/>:"Save"}</button>
         </form>
       </div>
       

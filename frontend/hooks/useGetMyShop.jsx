@@ -13,7 +13,6 @@ function useGetMyShop() {
             {withCredentials:true}
         )
         dispatch(setMyShopData(result.data));
-        console.log(result);
         } catch (error) {
             console.log(error);
         }

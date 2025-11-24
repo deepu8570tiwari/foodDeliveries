@@ -47,7 +47,6 @@ function SignIn() {
                 `${userServiceUrl}/api/v1/google-auth/signup`,{email:result.user.email},
                 {withCredentials:true}
             )
-            console.log(data);
             dispatch(setUserData(data));
         } catch (error) {
             const msg = error?.response?.data?.message || "Something went wrong";

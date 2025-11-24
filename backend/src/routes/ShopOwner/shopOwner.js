@@ -1,9 +1,10 @@
 import express from "express";
 const shopRouter=express.Router();
-import {createShop,editShop,getOwnShop} from "../../controllers/ShopOwner/shopOwner.js"
+import {createShop,editShop,getOwnShop, getShopbyUserCity} from "../../controllers/ShopOwner/shopOwner.js"
 import {upload} from "../../middleware/isUpload.js";
 import {isAuth} from "../../middleware/isAuth.js";
-shopRouter.post("/shop/create",isAuth, upload.single("image"),createShop);
-shopRouter.put("/shop/update",isAuth, upload.single("image"),editShop);
-shopRouter.get("/shop/list", isAuth, getOwnShop)
+shopRouter.post("/create",isAuth, upload.single("image"),createShop);
+shopRouter.put("/update",isAuth, upload.single("image"),editShop);
+shopRouter.get("/list", isAuth, getOwnShop);
+shopRouter.get("/shop-by-city/:city", isAuth, getShopbyUserCity);
 export default shopRouter;

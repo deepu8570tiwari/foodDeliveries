@@ -22,10 +22,10 @@ app.use(express.json());
 app.use(cookieParser())
 app.use("/api/v1",authRouter);
 app.use("/api/v1",resetRouter);
-app.use("/api/v1",googleRouter);
-app.use("/api/v1",userRouter);
-app.use("/api/v1",shopRouter);
-app.use("/api/v1",itemsRouter);
+app.use("/api/v1/google-auth",googleRouter);
+app.use("/api/v1/user",userRouter);
+app.use("/api/v1/shop",shopRouter);
+app.use("/api/v1/category",itemsRouter);
 app.listen(port,async()=>{
     console.log(`Server is running on ${port}`);
     await connectDB();

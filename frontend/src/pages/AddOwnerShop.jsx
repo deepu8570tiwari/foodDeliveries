@@ -10,7 +10,6 @@ import axios from 'axios';
 function AddOwnerShop() {
   const navigate=useNavigate();
   const {myShopData}=useSelector(state=>state.owner);
-  console.log("myshopData",myShopData)
   const {city,state,address}=useSelector(state=>state.user);
   const [name,setName]=useState(myShopData?.name || "");
   const [useraddress,setUserAddress]=useState(myShopData?.address || address);
@@ -18,6 +17,7 @@ function AddOwnerShop() {
   const [userstate,setUserState]=useState(myShopData?.state || state);
   const [shopimage,setShopImage]=useState(myShopData?.image || null);
   const [sentimage,setSentImage]=useState(null);
+  const [loading,setLoading]=useState(false);
   const dispatch = useDispatch();
   const handleImage=(e)=>{
     const file=e.target.files[0];
@@ -26,7 +26,7 @@ function AddOwnerShop() {
   }
   const handleSubmit=async(e)=>{
     e.preventDefault();
-    
+    setLoading(true);
     try {
       const formData=new FormData();
       formData.append("name", name);
@@ -36,7 +36,6 @@ function AddOwnerShop() {
       if(sentimage){
         formData.append("image",sentimage)
       }
-      console.log(`${userServiceUrl}/api/v1/shop/create`);
      const result = await axios.post(
         `${userServiceUrl}/api/v1/shop/create`,
         formData,
@@ -45,10 +44,12 @@ function AddOwnerShop() {
           withCredentials: true
         }
       );
-      console.log(result.data);
       dispatch(setMyShopData(result.data));
+      setLoading(false);
+      navigate("/");
     } catch (error) {
-      
+      setLoading(false);
+      console.log(error);
     }
   }
   return (
@@ -65,7 +66,7 @@ function AddOwnerShop() {
             {myShopData ? "Edit Shop": "Add Shop"}
           </div>
         </div>
-        <form className='space-y-5' onSubmit={handleSubmit} enctype="multipart/form-data">
+        <form className='space-y-5' onSubmit={handleSubmit} encType="multipart/form-data">
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>Name</label>
               <input type="text" placeholder='Enter Shop Name' onChange={(e)=>setName(e.target.value)}  value={name} className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-orange-500'/>
@@ -94,7 +95,7 @@ function AddOwnerShop() {
               <label className='block text-sm font-medium text-gray-700 mb-1'>Address</label>
               <input type="text" placeholder='Enter Shop Address' onChange={(e)=>setUserAddress(e.target.value)}  value={useraddress} className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-orange-500'/>
             </div>
-            <button type="submit" className='w-full cursor-pointer bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all'>Save</button>
+            <button type="submit" className='w-full cursor-pointer bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all' disabled={loading}>{loading ? <ClipLoader size={20} className='text-white'/>:"Save"}</button>
         </form>
       </div>
       
