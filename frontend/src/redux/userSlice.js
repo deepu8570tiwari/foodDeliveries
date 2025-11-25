@@ -9,7 +9,8 @@ const userSlice = createSlice({
     address: null,
     shopInMyCity: null,
     itemInMyCity: null,
-    cartItems: []        // ✅ FIXED
+    cartItems: [],
+    totalAmount:0,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -33,14 +34,25 @@ const userSlice = createSlice({
     setAddToCart: (state, action) => {
       const cartItem = action.payload;
       const existingItem = state.cartItems.find(i => i.id === cartItem.id);
-
       if (existingItem) {
         existingItem.quantity += cartItem.quantity;
       } else {
         state.cartItems.push(cartItem);
       }
-      console.log(state.cartItems);
-    }
+      state.totalAmount=state.cartItems.reduce((sum,i)=>sum+i.price*i.quantity,0)
+    },
+    updateQuantity:(state,action)=>{
+      const {id, quantity}=action.payload
+      const item=state.cartItems.find(i=>i.id==id)
+      if(item){
+        item.quantity=quantity;
+      }
+      state.totalAmount=state.cartItems.reduce((sum,i)=>sum+i.price*i.quantity,0)
+    },
+    setRemoveCartItems:(state,action)=>{
+      state.cartItems=state.cartItems.filter(i=>i.id!==action.payload);
+      state.totalAmount=state.cartItems.reduce((sum,i)=>sum+i.price*i.quantity,0)
+    },
   }
 });
 
@@ -51,7 +63,9 @@ export const {
   setAddress,
   setShopInMyCity,
   setItemInMyCity,
-  setAddToCart
+  setAddToCart,
+  updateQuantity,
+  setRemoveCartItems
 } = userSlice.actions;
 
 export default userSlice.reducer;
