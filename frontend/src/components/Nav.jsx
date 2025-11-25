@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 function Nav() {
-  const { userData, city } = useSelector(state => state.user);
+  const { userData, city,cartItems } = useSelector(state => state.user);
   const { myShopData } = useSelector(state => state.owner);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showDesktopSearch, setShowDesktopSearch] = useState(false);
@@ -130,9 +130,9 @@ function Nav() {
             <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-1.5 py-px'>0</span>
           </div>
         </>:(<>
-        <div className="relative cursor-pointer">
+        <div className="relative cursor-pointer" onClick={()=>navigate('/cart')}>
           <FiShoppingCart size={25} className="text-[#ff4d2d]" />
-          <span className="absolute right-[-9px] -top-3 text-[#ff4d2d]">0</span>
+          <span className="absolute right-[-9px] -top-3 text-[#ff4d2d]">{cartItems.length}</span>
         </div>
         
         <button className="hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium">

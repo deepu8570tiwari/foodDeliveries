@@ -116,3 +116,18 @@ export const deleteItems = tryCatch(async (req, res) => {
 
   return res.status(200).json(shop);
 });
+export const getItemByCity=tryCatch(async(req,res)=>{
+  const {city}=req.params;
+  if(!city){
+    return res.status(400).json({message:"City is required"});
+  }
+  const shops=await Shop.find({
+    city:{$regex: new RegExp(`^${city}$`,"i")}
+  }).populate('items');
+  if(!shops){
+    return res.status(400).json({message:"Shops not found"});
+  }
+  const shopsIds=shops.map((shop)=>shop._id);
+  const items=await Item.find({shop:{$in:shopsIds}})
+  return res.status(200).json(items);
+})

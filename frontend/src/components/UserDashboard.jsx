@@ -5,6 +5,7 @@ import CategoryCard from "./CategoryCard";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { setUserData,setShopInMyCity } from '../redux/userSlice';
+import FoodCard from "./FoodCard";
 
 function UserDashboard() {
   const scrollRef = useRef(null);
@@ -16,8 +17,7 @@ function UserDashboard() {
   const scrollRight = () => {
     scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
   };
-  const {city,shopInMyCity}=useSelector(state=>state.user);
-  console.log("setShopInMyCity",shopInMyCity);
+  const {city,shopInMyCity,itemInMyCity}=useSelector(state=>state.user);
   return (
     <div className="w-full min-h-screen bg-[#fff9f6] flex flex-col items-center">
       <Nav />
@@ -100,7 +100,16 @@ function UserDashboard() {
 
         </div>
       </div>
-      
+      <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-2.5">
+        <h1 className="text-xl font-semibold text-gray-800">
+          Suggested Food Items
+        </h1>
+        <div className="w-full h-auto flex flex-wrap gap-5 justify-center">
+          {itemInMyCity?.map((item,index)=>(
+            <FoodCard key={index} data={item}/>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

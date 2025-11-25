@@ -12,13 +12,18 @@ import AddItems from './pages/AddItems';
 import EditOwnerShop from './pages/EditOwnerShop';
 import EditItems from './pages/EditItems';
 import useGetShopByCity from '../hooks/useGetShopByCity';
+import useGetItemsByCity from '../hooks/useGetItemsByCity';
+import CartPage from './pages/CartPage';
 export const userServiceUrl='http://localhost:5000';
 function App() {
   useGetCurrentUser();
   useGetCity();
-  useGetMyShop();
   useGetShopByCity();
+  useGetItemsByCity();
   const {userData}=useSelector(state=>state.user);
+  if(userData?.data.roles==="owner"){
+    useGetMyShop();
+  }
   return (
     <Routes>
       <Route path="/signup" element={!userData ? <SignUp/> :<Navigate to={"/"}/>}/>
@@ -29,6 +34,7 @@ function App() {
       <Route path="/edit-shop" element={userData ? <EditOwnerShop/>: <Navigate to={"/signin"}/>}/>
       <Route path="/add-items" element={userData ? <AddItems/>: <Navigate to={"/signin"}/>}/>
       <Route path="/edit-items/:itemId" element={userData ? <EditItems/>: <Navigate to={"/signin"}/>}/>
+      <Route path="/cart" element={userData ? <CartPage/>: <Navigate to={"/signin"}/>}/>
     </Routes>
   )
 }
