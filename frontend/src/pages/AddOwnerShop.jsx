@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { userServiceUrl } from '../App';
 import { setMyShopData } from '../redux/ownerSlice';
 import axios from 'axios';
+import { ClipLoader } from 'react-spinners';
 
 function AddOwnerShop() {
   const navigate=useNavigate();

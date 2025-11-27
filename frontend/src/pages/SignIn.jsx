@@ -29,7 +29,7 @@ function SignIn() {
                 email,password},
                 {withCredentials:true}
             )
-            console.log(result);
+            console.log("resultSignIN",result);
             setError("");
             dispatch(setUserData(result.data));
             setLoading(false);

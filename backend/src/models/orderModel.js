@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
-
 const shopOrderItemsSchema = new mongoose.Schema({
   item: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Item",
     required: true
+  },
+  name:{
+    type:String,
+    required:true,
   },
   price: { 
     type: Number, 
@@ -29,7 +32,21 @@ const shopOrderSchema = new mongoose.Schema({
     required: true
   },
   subtotal: { type: Number, required: true },
-  shopOrderItems: [shopOrderItemsSchema]
+  shopOrderItems: [shopOrderItemsSchema],
+  status: {
+    type: String,
+    enum: ["pending", "preparing", "outfordelivery", "delivered","cancelled"],
+    default: "pending"
+  },
+  assignment:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"deliveryAssignment",
+    default:null
+  },
+  assignedDeliveryBoy:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"User",
+  }
 }, { timestamps: true });
 
 const orderSchema = new mongoose.Schema({
@@ -49,12 +66,7 @@ const orderSchema = new mongoose.Schema({
     longitude: { type: Number, required: true }
   },
   totalAmount: { type: Number, required: true },
-  status: {
-    type: String,
-    enum: ["pending", "approved", "shipped", "delivered", "cancelled"],
-    default: "pending"
-  },
-  shopOrder: [shopOrderSchema]
+  shopOrders: [shopOrderSchema]
 }, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);

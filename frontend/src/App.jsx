@@ -15,16 +15,22 @@ import useGetShopByCity from '../hooks/useGetShopByCity';
 import useGetItemsByCity from '../hooks/useGetItemsByCity';
 import CartPage from './pages/CartPage';
 import CheckOut from './pages/CheckOut';
+import OrderPlaced from './pages/OrderPlaced';
+import MyOrders from './pages/MyOrders';
+import useGetMyOrder from '../hooks/useGetMyOrders';
+import useUpdateLocation from '../hooks/useUpdateLocation';
 export const userServiceUrl='http://localhost:5000';
 function App() {
-  useGetCurrentUser();
-  useGetCity();
-  useGetShopByCity();
-  useGetItemsByCity();
   const {userData}=useSelector(state=>state.user);
-  if(userData?.data.roles==="owner"){
-    useGetMyShop();
-  }
+  //console.log("userData",userData)
+
+   useGetCurrentUser();
+   useUpdateLocation();
+   useGetCity();
+   useGetShopByCity();
+   useGetItemsByCity();
+   useGetMyShop();
+   useGetMyOrder();
   return (
     <Routes>
       <Route path="/signup" element={!userData ? <SignUp/> :<Navigate to={"/"}/>}/>
@@ -37,6 +43,8 @@ function App() {
       <Route path="/edit-items/:itemId" element={userData ? <EditItems/>: <Navigate to={"/signin"}/>}/>
       <Route path="/cart" element={userData ? <CartPage/>: <Navigate to={"/signin"}/>}/>
       <Route path="/checkout" element={userData ? <CheckOut/>: <Navigate to={"/signin"}/>}/>
+      <Route path="/order-placed" element={userData ? <OrderPlaced/>: <Navigate to={"/signin"}/>}/>
+      <Route path="/my-orders" element={userData ? <MyOrders/>: <Navigate to={"/signin"}/>}/>
     </Routes>
   )
 }

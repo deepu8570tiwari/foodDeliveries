@@ -6,10 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { setMyShopData } from '../redux/ownerSlice';
 import OwnerItemCard from './OwnerItemCard';
 function OwnerDashboard() {
+  const dispatch=useDispatch();
   const { myShopData } = useSelector(state => state.owner);
   const navigate = useNavigate();  // <-- Corrected
-  const dispatch=useDispatch();
-  
   return (
     <div className="w-full min-h-screen bg-[#fff9f6] flex flex-col items-center">
       <Nav/>

@@ -9,6 +9,7 @@ import googleRouter from "./routes/Auth/googleRouter.js";
 import userRouter from "./routes/Users/userRouter.js";
 import shopRouter from "./routes/ShopOwner/shopOwner.js";
 import itemsRouter from "./routes/ShopOwner/itemList.js";
+import orderRouter from "./routes/Order/orderRoutes.js";
 dotenv.config();
 const app=express();
 app.use(cors({
@@ -26,6 +27,7 @@ app.use("/api/v1/google-auth",googleRouter);
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/shop",shopRouter);
 app.use("/api/v1/category",itemsRouter);
+app.use("/api/v1/orders",orderRouter);
 app.listen(port,async()=>{
     console.log(`Server is running on ${port}`);
     await connectDB();

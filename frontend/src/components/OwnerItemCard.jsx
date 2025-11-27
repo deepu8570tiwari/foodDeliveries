@@ -33,7 +33,7 @@ function OwnerItemCard({data}) {
             <p><span className='font-medium text-gray-70'>Food Type:</span>{data.foodType}</p>
         </div>
         <div className='flex items-center justify-between'>
-            <div className='text-[#ff4d2d] font-bold'>{data.price}</div>
+            <div className='text-[#ff4d2d] font-bold'>₹ {data.price}</div>
             <div className='flex items-center gap-2'>
                 <div className='p-2 rounded-full hover:bg-[#ff4d2d]/10 text-[#ff4d2d] cursor-pointer'>
                 <FaPen size={16} onClick={()=>navigate(`/edit-items/${data._id}`)}/>

@@ -32,8 +32,10 @@ function SignUp() {
                 fullname, email,password,mobile, roles:role},
                 {withCredentials:true}
             )
-            dispatch(setUserData(result.data.data));
+            console.log("result",result);
+            dispatch(setUserData(result.data));
             setError("");
+            navigate('/');
             setLoading(false);
         } catch (error) {
             const msg = error?.response?.data?.message || "Something went wrong";
@@ -57,6 +59,7 @@ function SignUp() {
             )
             dispatch(setUserData(data.data));
             setError("");
+            navigate('/');
         } catch (error) {
             console.log("error",error);
         }

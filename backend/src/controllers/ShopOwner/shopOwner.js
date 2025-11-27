@@ -1,4 +1,5 @@
 import { uploadToCloudinary } from "../../middleware/isUpload.js";
+import Order from "../../models/orderModel.js";
 import Shop from "../../models/shopModel.js";
 import {tryCatch} from "../../utils/tryCatch.js"
 export const createShop = tryCatch(async (req, res) => {
@@ -23,9 +24,11 @@ export const createShop = tryCatch(async (req, res) => {
   });
 
   // Correct populate
-  shop = await shop.populate("owner").populate("items");
+  const populatedShop = await Shop.findById(shop._id)
+    .populate("owner")
+    .populate("items");
 
-  return res.status(201).json(shop);
+  return res.status(201).json(populatedShop);
 });
 
 export const editShop=tryCatch(async(req,res)=>{
@@ -66,7 +69,6 @@ export const getOwnShop = tryCatch(async (req, res) => {
 });
 export const getShopbyUserCity = tryCatch(async (req, res) => {
   const { city } = req.params;
-
   const shops = await Shop.find({
     city: { $regex: new RegExp(`^${city.trim()}$`, "i") }
   }).populate({

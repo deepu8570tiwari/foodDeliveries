@@ -120,22 +120,23 @@ function Nav() {
           
           </>}
 
-          <div className='hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
+          <div onClick={()=>navigate('/my-orders')} className=' hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
             <TbReceipt2 size={20}/>
-            <span>My Orders</span>
+            <span>My Orders 1</span>
             <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-1.5 py-px'>0</span>
           </div>
-          <div className='md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
+          <div onClick={()=>navigate('/my-orders')} className='md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-medium'>
             <TbReceipt2 size={20}/>
             <span className='absolute -right-2 -top-2 text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-1.5 py-px'>0</span>
           </div>
         </>:(<>
+        {userData.data.roles=="user" && 
         <div className="relative cursor-pointer" onClick={()=>navigate('/cart')}>
           <FiShoppingCart size={25} className="text-[#ff4d2d]" />
           <span className="absolute right-[-9px] -top-3 text-[#ff4d2d]">{cartItems.length}</span>
         </div>
-        
-        <button className="hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium">
+        }
+        <button onClick={()=>navigate("/my-orders")} className=" cursor-pointer hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-sm font-medium">
           My Orders
         </button></>)
         }
@@ -152,12 +153,12 @@ function Nav() {
 
         {/* User Info Dropdown */}
         {showInfo && (
-          <div className="fixed top-20 right-2.5 md:right-[10%] lg:right-[13%] w-[180px] bg-white shadow-2xl p-5 flex flex-col gap-2.5 z-9999">
+          <div className={`fixed top-20 right-2.5 ${userData.data.roles==="delivery" ?"md:right-[20%] lg:right-[40%]" :"md:right-[10%] lg:right-[25%]"} w-[180px] bg-white shadow-2xl p-5 flex flex-col gap-2.5 z-9999`}>
             <div className="text-[17px] font-semibold">
               {userData?.data.fullname}
             </div>
             {userData?.data.roles=="user" && (
-              <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
+              <div  onClick={()=>navigate("/my-orders")}className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
               My Orders
             </div>
             )}
