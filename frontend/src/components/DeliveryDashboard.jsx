@@ -1,36 +1,177 @@
-import React, { useEffect } from 'react'
-import Nav from "../components/Nav"
-import { useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react';
+import Nav from "../components/Nav";
+import { useSelector } from 'react-redux';
 import { userServiceUrl } from '../App';
 import axios from 'axios';
+import DeliveryTracking from './deliveryTracking';
+
 function DeliveryDashboard() {
-  const {userData}=useSelector(state=>state.user);
-  const getAssignment=async()=>{
+  const { userData } = useSelector(state => state.user);
+  const [availableAssignments, setAvailableAssignment] = useState([]);
+  const [showOtpBox, setShowOtpBox]=useState(false);
+  const [currentOrder,setCurrentOrder]=useState()
+  const getAssignment = async () => {
     try {
       const result = await axios.get(
         `${userServiceUrl}/api/v1/orders/get-assignments`,
-        {
-          withCredentials: true
-        }
+        { withCredentials: true }
       );
+      setAvailableAssignment(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAssignedOrder=async(assignmentId)=>{
+    try {
+      const result = await axios.get(
+        `${userServiceUrl}/api/v1/orders/current-assigned-order`,
+        { withCredentials: true }
+      );
+      setCurrentOrder(result.data);
+      console.log("Assigned Order to delivery boys", result.data);
+    } catch (error) {
+      console.log(error)
+    }
+  } 
+  const acceptOrder=async(assignmentId)=>{
+    try {
+      const result = await axios.get(
+        `${userServiceUrl}/api/v1/orders/accept-order/${assignmentId}`,
+        { withCredentials: true }
+      );
+      console.log("Accept Order", result.data);
+      getAssignedOrder();
     } catch (error) {
       console.log(error)
     }
   }
-  useEffect(()=>{
-  getAssignment()
-  },[userData])
+  const handleSendOtp=(e)=>{
+    setShowOtpBox(true);
+  }
+  useEffect(() => {
+    getAssignment();
+    getAssignedOrder();
+  }, [userData]);
+
   return (
-    <div className='w-full min-h-screen bg-[#fff9f6] flex flex-col items-center gap-5 overflow-y-auto'>
-      <Nav/>
-      <div className='w-full max-w-[800px] flex flex-col gap-5 items-center'>
-        <div className='bg-white rounded-2xl shadow-md p-5 flex flex-col justify-start text-center gap-2 items-center w-[90%] border border-orange-100'>
-          <h1 className='text-xl font-bold text-[#ff4d2d] '>Welcome, {userData.data.fullname}</h1>
-          <p className='text-[#ff4d2d]'><span className='font-semibold'>Latitude:</span> {userData.data.location.coordinates[0]},<span className='font-semibold'>Longitude:</span> {userData.data.location.coordinates[1]}</p>
+    <div className="w-full min-h-screen bg-[#fff9f6] flex flex-col items-center gap-5 overflow-y-auto">
+  <Nav />
+
+  <div className="w-full max-w-[800px] flex flex-col gap-5 items-center">
+
+    {/* USER INFO CARD */}
+    <div className="bg-white rounded-2xl shadow-md p-5 text-center w-[90%] border border-orange-100">
+      <h1 className="text-xl font-bold text-[#ff4d2d]">
+        Welcome, {userData.data.fullname}
+      </h1>
+
+      <p className="text-[#ff4d2d] mt-1">
+        <span className="font-semibold">Latitude: </span>
+        {userData.data.location.coordinates[0]},
+        <span className="font-semibold ml-1">Longitude:</span>{" "}
+        {userData.data.location.coordinates[1]}
+      </p>
+    </div>
+
+    {/* ========================== AVAILABLE ORDERS ========================== */}
+    {!currentOrder && (
+      <div className="bg-white rounded-2xl p-5 shadow w-[90%] border border-orange-100">
+        <h1 className="text-lg font-bold mb-4">Available Orders</h1>
+
+        <div className="space-y-4">
+          {availableAssignments.length > 0 ? (
+            availableAssignments.map((a, index) => (
+              <div
+                key={index}
+                className="border rounded-lg p-4 flex justify-between items-center"
+              >
+                <div>
+                  <p className="text-sm font-semibold">{a?.shopName}</p>
+
+                  <p className="text-sm text-gray-600 mt-1">
+                    <span className="font-semibold">Delivery Address:</span>{" "}
+                    {a?.deliveryAddress?.text}
+                  </p>
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    {a.item?.length} items • ₹{a.subtotal}
+                  </p>
+                </div>
+
+                <button
+                  className="cursor-pointer bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600"
+                  onClick={() => acceptOrder(a.assignmentId)}
+                >
+                  Accept
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400 text-sm">No Available Orders</p>
+          )}
         </div>
       </div>
-    </div>
-  )
+    )}
+
+    {/* ========================== CURRENT ORDER SECTION ========================== */}
+    {currentOrder && (
+      <div className="bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100">
+        <h2 className="text-lg font-bold mb-3">📦 Current Order</h2>
+
+        {/* ORDER DETAIL BOX */}
+        <div className="border rounded-lg p-4 mb-3">
+          <p className="font-semibold text-sm">
+            {currentOrder?.shopOrder?.shop?.name}
+          </p>
+
+          <p className="text-sm text-gray-500 mt-1">
+            {currentOrder?.deliveryAddress?.text}
+          </p>
+
+          <p className="text-xs text-gray-400 mt-1">
+            {currentOrder?.shopOrder?.shopOrderItems?.length} items • ₹
+            {currentOrder?.shopOrder?.subtotal}
+          </p>
+        </div>
+
+        {/* LIVE TRACKING MAP */}
+        <DeliveryTracking data={currentOrder} />
+
+        {/* DELIVERY OTP BOX */}
+        {!showOtpBox ? (
+          <button
+            className="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200"
+            onClick={handleSendOtp}
+          >
+            Mark As Delivered
+          </button>
+        ) : (
+          <div className="mt-4 p-4 border rounded-xl bg-gray-50">
+            <p className="text-sm font-semibold mb-2">
+              Enter OTP sent to{" "}
+              <span className="text-orange-500">
+                {currentOrder.user.fullname}
+              </span>
+            </p>
+
+            <input
+              type="text"
+              className="w-full border px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              placeholder="Enter OTP"
+            />
+
+            <button className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-all">
+              Submit OTP
+            </button>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</div>
+
+  );
 }
 
-export default DeliveryDashboard
+export default DeliveryDashboard;

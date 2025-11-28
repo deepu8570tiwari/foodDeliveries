@@ -19,3 +19,11 @@ export const sentOTPEmail=tryCatch(async(to,otp)=>{
         html:`<p>Your OTP for password reset is <b>${otp}</b>.It expire in 5 Minutes`
     })
 })
+export const sentDeliveryEmail=tryCatch(async(user,otp)=>{
+    await transporter.sendMail({
+        from:process.env.NODE_EMAIL_ADDRESS,
+        to:user.email,
+        subject:"Delivery OTP",
+        html:`<p>Your OTP for delivery is <b>${otp}</b>.It expire in 5 Minutes`
+    })
+})
