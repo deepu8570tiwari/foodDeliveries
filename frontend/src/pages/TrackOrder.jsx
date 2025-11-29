@@ -30,7 +30,6 @@ function TrackOrder() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 flex flex-col gap-6">
-
       {/* Back Button */}
       <div
         className="flex items-center gap-3 mb-2 cursor-pointer"
@@ -48,13 +47,11 @@ function TrackOrder() {
       {/* Shop Orders */}
       {currentOrder?.shopOrders?.map((shopOrder, index) => {
         const deliveryBoy = shopOrder.assignedDeliveryBoy; // object or null
-
         return (
           <div
             className="bg-white p-5 rounded-2xl shadow-md border border-orange-300 space-y-4"
             key={index}
           >
-            {/* Shop Details */}
             <div>
               <p className="text-lg font-bold text-[#ff4d2d]">
                 {shopOrder?.shop?.name}

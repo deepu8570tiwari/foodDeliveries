@@ -77,7 +77,7 @@ export const getShopbyUserCity = tryCatch(async (req, res) => {
   });
 
   if (shops.length === 0) {
-    return res.status(404).json({ message: "No shops found in this city" });
+    return res.status(400).json({ message: "No shops found in this city" });
   }
   return res.status(200).json(shops);
 });

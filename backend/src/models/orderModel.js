@@ -77,7 +77,20 @@ const orderSchema = new mongoose.Schema({
     longitude: { type: Number, required: true }
   },
   totalAmount: { type: Number, required: true },
-  shopOrders: [shopOrderSchema]
+  shopOrders: [shopOrderSchema],
+  payment:{
+    type:Boolean,
+    default:false
+  },
+  razorPayOrderId:{
+    type:String,
+    default:""
+  },
+  razorPayPayment:{
+    type:String,
+    default:""
+  }
+
 }, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);

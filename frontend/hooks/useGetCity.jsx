@@ -19,7 +19,7 @@ function useGetCity() {
         const result = await axios.get(
           `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${api_key}`
         );
-
+        console.log("UserAddress",result.data);
         const city = result?.data?.results?.[0]?.city || "Unknown";
         const state = result?.data?.results?.[0]?.state || "Unknown";
         const address = result?.data?.results?.[0]?.address_line2 || result?.data?.results?.[0]?.address_line1 || "Unknown";

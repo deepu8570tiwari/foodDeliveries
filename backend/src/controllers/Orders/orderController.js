@@ -4,6 +4,13 @@ import { tryCatch } from "../../utils/tryCatch.js";
 import User from "../../models/userModel.js";
 import deliveryAssignment from "../../models/deliveryModel.js";
 import { sentDeliveryEmail } from "../../utils/mailer.js";
+import dotenv from "dotenv";
+dotenv.config();
+import RazorPay from "razorpay"
+var instance = new RazorPay({
+  key_id: process.env.RAZORPAY_API_KEY,
+  key_secret: process.env.RAZORPAY_SECRET_KEY,
+});
 export const placeOrder = tryCatch(async (req, res) => {
     const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body;
 
@@ -59,7 +66,27 @@ export const placeOrder = tryCatch(async (req, res) => {
             };
         })
     );
-
+    if(paymentMethod=="online"){
+      const razorOrder=await instance.orders.create({
+        amount:Math.round(totalAmount*100),
+        currency:'INR',
+        receipt:`receipt_${Date.now()}`
+      })
+       const newOrder = await Order.create({
+        user: req.userId,
+        paymentMethod,
+        deliveryAddress,
+        totalAmount,
+        shopOrders,
+        razorPayOrderId:razorOrder.id,
+        payment:false
+    });
+    return res.status(200).json({
+      razorOrder,
+      orderId:newOrder._id,
+      key_id: process.env.RAZORPAY_API_KEY
+    })
+    }
     // Create order
     const newOrder = await Order.create({
         user: req.userId,
@@ -100,10 +127,10 @@ export const getUserOrders = tryCatch(async (req, res) => {
       deliveryAddress: order.deliveryAddress,
       user: order.user,
       createdAt: order.createdAt,
-
+      payment:order.payment,
       // PICK ONLY THE SHOP ORDER OF THIS OWNER
       shopOrders: order.shopOrders.find(
-        (o) => o.owner._id.toString() === req.userId
+        o => o.owner._id.toString() === req.userId
       ),
     }));
 
@@ -114,7 +141,7 @@ export const updateOrderStatus = tryCatch(async (req, res) => {
   const { orderId, shopId } = req.params;
   const { status } = req.body;
   const order = await Order.findById(orderId)
-  if (!order) return res.status(404).json({ message: "Order not found" });
+  if (!order) return res.status(400).json({ message: "Order not found" });
 
   const shopOrder = order.shopOrders.find(
     o => o.shop.toString() === shopId
@@ -355,7 +382,7 @@ export const sendDeliveryOTP=tryCatch(async(req,res)=>{
 })
 
 export const verifyDeliveryOTP=tryCatch(async(req,res)=>{
-  const {orderId,shopOrderId}=req.body;
+  const {orderId,shopOrderId,otp}=req.body;
   const order=await Order.findById(orderId).populate("user")
   const shopOrder=order.shopOrders.id(shopOrderId)
   if(!order || !shopOrder){
@@ -373,4 +400,22 @@ export const verifyDeliveryOTP=tryCatch(async(req,res)=>{
     assignedTo:shopOrder.assignedDeliveryBoy
   })
   return res.status(200).json({message:"Order Delivered Successfully"});
+})
+
+export const verifyPayment=tryCatch(async(req,res)=>{
+  const {razorpay_payment_id,orderId}=req.body
+  const payment=await instance.payments.fetch(razorpay_payment_id);
+  if(!payment || payment.status!="captured"){
+    return res.status(400).json({message:"Payment not captured"})
+  }
+  const order=await Order.findById(orderId);
+  if(!order){
+    return res.status(400).json({message:"Order not found"})
+  }
+  order.payment=true
+  order.razorPayPayment=razorpay_payment_id;
+  await order.save()
+  await order.populate("shopOrders.shopOrderItems.item","name image price");
+  await order.populate("shopOrders.shop","name");
+  return res.status(200).json(order)
 })

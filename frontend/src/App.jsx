@@ -20,10 +20,11 @@ import MyOrders from './pages/MyOrders';
 import useGetMyOrder from '../hooks/useGetMyOrders';
 import useUpdateLocation from '../hooks/useUpdateLocation';
 import TrackOrder from './pages/TrackOrder';
+import Shop from './pages/Shop';
 export const userServiceUrl='http://localhost:5000';
 function App() {
   const {userData}=useSelector(state=>state.user);
-  //console.log("userData",userData)
+  console.log("userData",userData)
 
    useGetCurrentUser();
    useUpdateLocation();
@@ -47,6 +48,7 @@ function App() {
       <Route path="/order-placed" element={userData ? <OrderPlaced/>: <Navigate to={"/signin"}/>}/>
       <Route path="/my-orders" element={userData ? <MyOrders/>: <Navigate to={"/signin"}/>}/>
       <Route path="/track-orders/:orderId" element={userData ? <TrackOrder/>: <Navigate to={"/signin"}/>}/>
+      <Route path="/shop/:shopId" element={userData ? <Shop/>: <Navigate to={"/signin"}/>}/>
     </Routes>
   )
 }

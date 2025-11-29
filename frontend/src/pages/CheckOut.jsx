@@ -99,15 +99,49 @@ function CheckOut() {
                     latitude:location.lat,
                     longitude:location.lon
                 },
-                totalAmount,
+                totalAmount:amountWithDeliveryFee,
                 cartItems
             },{withCredentials:true});
+            if(paymentMethod=="cod"){
+                dispatch(setAddOrders(result.data))
+                navigate("/order-placed");
+            }else{
+                const orderId=result.data.orderId
+                const razorOrder=result.data.razorOrder
+                openRazorPay(orderId,razorOrder)
+            }
             console.log(result.data)
-            dispatch(setAddOrders(result.data))
-            navigate("/order-placed");
         } catch (error) {
             console.log(error);
         }
+    }
+    const openRazorPay=(orderId,razorOrder)=>{
+        const options = {
+        key: import.meta.env.VITE_RAZORPAY_API_KEY, // Replace with your actual Key ID
+        amount: razorOrder.amount, // Amount in smallest currency unit (e.g., paise for INR)
+        currency: 'INR',
+        name: 'Zigato',
+        description: 'Food Delivery Website',
+        order_id: razorOrder.id, // Optional: If you've created an order on your backend
+        handler:async function (response) {
+            try {
+                const result=await axios.post(`${userServiceUrl}/api/v1/orders/verify-payment`,{
+                    razorpay_payment_id:response.razorpay_payment_id,
+                    orderId
+                },{withCredentials:true})
+                dispatch(setAddOrders(result.data))
+                navigate("/order-placed");
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        theme: {
+            color: '#ff4d2d'
+        }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
     }
     
     useEffect(()=>{
