@@ -1,14 +1,35 @@
 import React from 'react'
 import { IoIosArrowRoundBack } from 'react-icons/io';
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import UserOrderCard from '../components/UserOrderCard';
 import OwnerOrderCard from '../components/OwnerOrderCard';
+import { useEffect } from 'react';
+import { setMyOrders, updateRealTimeOrderStatus } from '../redux/userSlice';
 
 function MyOrders() {
-  const {userData, myOrders} =useSelector(state=>state.user);
-  console.log("Hi USerData",userData)
+  const {userData, myOrders, socket} =useSelector(state=>state.user);
   const navigate=useNavigate();
+  const dispatch=useDispatch();
+  useEffect(()=>{
+    socket?.on("newOrder",(data)=>{
+      console.log(data.shopOrders?.owner._id,"===",userData?.data._id);
+      console.log("newOrder",data);
+      console.log("myOrder",myOrders)
+      if(data.shopOrders?.owner._id===userData?.data._id){
+        dispatch(setMyOrders([data,...myOrders]))
+      }
+    })
+    socket?.on("updateOrderStatus",({orderId,shopId,status,userId})=>{
+      if(userId===userData?.data._id){
+        dispatch(updateRealTimeOrderStatus({orderId,shopId,status}))
+      }
+    })
+    return ()=>{
+      socket?.off("newOrder");
+      socket?.off("updateOrderStatus");
+    }
+  },[socket])
   return (
     <div className='w-full min-h-screen bg-[#fff9f6] flex justify-center px-4 '>
       <div className='w-full max-w-[800px] p-4'>

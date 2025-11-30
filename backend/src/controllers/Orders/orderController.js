@@ -95,8 +95,28 @@ export const placeOrder = tryCatch(async (req, res) => {
         totalAmount,
         shopOrders,
     });
-    await newOrder.populate("shopOrders.shopOrderItems.item","name image price");
-    await newOrder.populate("shopOrders.shop","name");
+    await newOrder.populate("shopOrders.shop", "name socketId");
+    await newOrder.populate("shopOrders.owner", "fullname email mobile socketId");
+    await newOrder.populate("shopOrders.shopOrderItems.item", "name image price");
+    await newOrder.populate("user", "fullname email mobile");
+
+    const io=req.app.get('io');
+    if(io){
+      newOrder.shopOrders.forEach(shopOrder=>{
+        const ownerSocketId=shopOrder.owner.socketId
+        if(ownerSocketId){
+          io.to(ownerSocketId).emit("newOrder",{
+            _id: newOrder._id,
+            paymentMethod: newOrder.paymentMethod,
+            deliveryAddress: newOrder.deliveryAddress,
+            user: newOrder.user,
+            createdAt: newOrder.createdAt,
+            payment:newOrder.payment,
+            shopOrders: shopOrder
+          })
+        }
+      })
+    }
     return res.status(201).json(newOrder);
 });
 export const getUserOrders = tryCatch(async (req, res) => {
@@ -153,12 +173,9 @@ export const updateOrderStatus = tryCatch(async (req, res) => {
 
   // Update status
   shopOrder.status = status;
-
   let deliveryBoyPayload = [];
-  console.log("shopOrderAssignment",shopOrder.assignment);
   if (status === "outfordelivery" && !shopOrder.assignment) {
     const { longitude, latitude } = order.deliveryAddress;
-    console.log("Hi Buddy");
     // Step 1: find nearby delivery boys (5 km)
     const nearByDeliveryBoy = await User.find({
       roles: "delivery",
@@ -172,7 +189,6 @@ export const updateOrderStatus = tryCatch(async (req, res) => {
         }
       }
     });
-    console.log("nearbyRider",nearByDeliveryBoy);
     const nearbyIds = nearByDeliveryBoy.map(b => b._id);
     // Step 2: find busy delivery boys
     const busyDeliveryIds = await deliveryAssignment.find({
@@ -220,8 +236,19 @@ export const updateOrderStatus = tryCatch(async (req, res) => {
   );
   await order.populate("shopOrders.shop","name")
   await order.populate("shopOrders.assignedDeliveryBoy","fullname email mobile")
-
-  
+  await order.populate("user","socketId")
+  console.log("order?.user.socketId",order?.user.socketId)
+  const io=req.app.get("io")
+  if(io){
+    const userSocketId=order?.user.socketId;
+    if(userSocketId)
+      io.to(userSocketId).emit("updateOrderStatus",{
+      orderId:order._id,
+      shopId:updatedShopOrder.shop._id,
+      status:updatedShopOrder.status,
+      userId:order.user._id
+    })
+  }
 
   return res.status(200).json({
     shopOrder: updatedShopOrder,
@@ -412,10 +439,30 @@ export const verifyPayment=tryCatch(async(req,res)=>{
   if(!order){
     return res.status(400).json({message:"Order not found"})
   }
-  order.payment=true
+  order.paymorder
   order.razorPayPayment=razorpay_payment_id;
   await order.save()
-  await order.populate("shopOrders.shopOrderItems.item","name image price");
-  await order.populate("shopOrders.shop","name");
+  await order.populate("shopOrders.shop", "name socketId");
+  await order.populate("shopOrders.owner", "fullname email mobile socketId");
+  await order.populate("shopOrders.shopOrderItems.item", "name image price");
+  await order.populate("user", "fullname email mobile");
+
+    const io=req.app.get('io');
+    if(io){
+      order.shopOrders.forEach(shopOrder=>{
+        const ownerSocketId=shopOrder.owner.socketId
+        if(ownerSocketId){
+          io.to(ownerSocketId).emit("newOrder",{
+            _id: order._id,
+            paymentMethod: order.paymentMethod,
+            deliveryAddress: order.deliveryAddress,
+            user: order.user,
+            createdAt: order.createdAt,
+            payment:order.payment,
+            shopOrders: shopOrder
+          })
+        }
+      })
+    }
   return res.status(200).json(order)
 })
