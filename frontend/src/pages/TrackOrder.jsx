@@ -4,13 +4,14 @@ import axios from "axios";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import DeliveryTracking from "../components/deliveryTracking";
 import { userServiceUrl } from "../App";
+import { useSelector } from "react-redux";
 
 function TrackOrder() {
   const { orderId } = useParams();
   const navigate = useNavigate();
-
   const [currentOrder, setCurrentOrder] = useState(null);
-
+  const {socket}=useSelector(state=>state.user);
+  const [liveLocation,setLiveLocation]=useState({})
   const handleGetOrder = async () => {
     try {
       const result = await axios.get(
@@ -23,6 +24,22 @@ function TrackOrder() {
       console.log(error);
     }
   };
+  useEffect(() => {
+  if (!socket) return;
+
+  const handleLocation = ({ deliveryBoyId, latitude, longitude }) => {
+    console.log("handleLiveLocation")
+    setLiveLocation(prev => ({
+      ...prev,
+      [deliveryBoyId]: { lat: longitude, lon:latitude}
+    }));
+  };
+  socket.on("updateDeliveredLocation", handleLocation);
+
+  return () => {
+    socket.off("updateDeliveredLocation", handleLocation);
+  };
+}, [socket]);
 
   useEffect(() => {
     handleGetOrder();
@@ -104,7 +121,7 @@ function TrackOrder() {
               <div className="h-[400px] w-full rounded-2xl overflow-hidden shadow-md">
                 <DeliveryTracking
                   data={{
-                    deliveryBoyLocation: {
+                    deliveryBoyLocation:liveLocation[shopOrder.assignedDeliveryBoy._id] || {
                       lat: deliveryBoy.location?.coordinates?.[0],
                       lon: deliveryBoy.location?.coordinates?.[1],
                     },

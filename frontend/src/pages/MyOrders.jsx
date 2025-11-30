@@ -13,9 +13,7 @@ function MyOrders() {
   const dispatch=useDispatch();
   useEffect(()=>{
     socket?.on("newOrder",(data)=>{
-      console.log(data.shopOrders?.owner._id,"===",userData?.data._id);
-      console.log("newOrder",data);
-      console.log("myOrder",myOrders)
+      console.log(data.shopOrders?.owner._id,"===",userData?.data._id); 
       if(data.shopOrders?.owner._id===userData?.data._id){
         dispatch(setMyOrders([data,...myOrders]))
       }

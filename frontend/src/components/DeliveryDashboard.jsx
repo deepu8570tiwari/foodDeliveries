@@ -4,13 +4,44 @@ import { useSelector } from 'react-redux';
 import { userServiceUrl } from '../App';
 import axios from 'axios';
 import DeliveryTracking from './deliveryTracking';
+import { useNavigate } from 'react-router-dom';
 
 function DeliveryDashboard() {
-  const { userData } = useSelector(state => state.user);
-  const [availableAssignments, setAvailableAssignment] = useState([]);
+  const { userData,socket } = useSelector(state => state.user);
+  const [availableAssignments, setAvailableAssignment] = useState(null);
   const [showOtpBox, setShowOtpBox]=useState(false);
   const [currentOrder,setCurrentOrder]=useState()
   const [otp,setOTP]=useState("");
+  const [deliveryBoyLocation,setDeliveryBoyLocation]=useState(null)
+  const navigate=useNavigate();
+  useEffect(()=>{
+    
+    if(!socket || userData?.data.roles!=="delivery") return 
+    let watchId=null;
+    console.log("UserLocationforDeliveryRidexxs",userData?.data.roles)
+      if(navigator.geolocation){
+        watchId= navigator.geolocation.watchPosition((position)=>{
+          const latitude=position.coords.latitude
+          const longitude=position.coords.longitude
+          setDeliveryBoyLocation({lat:longitude,lon:latitude})
+          socket.emit('updateLocation',{
+            latitude,
+            longitude,
+            userId:userData?.data._id
+          })
+        }),
+        (error)=>{
+          console.log(error)
+        },
+        {
+          enableHighAccuracy:true,
+        }
+      }
+      return ()=>{
+        if(watchId)
+          navigator.geolocation.clearWatch(watchId)
+      }
+  },[socket,userData])
   const getAssignment = async () => {
     try {
       const result = await axios.get(
@@ -64,6 +95,7 @@ function DeliveryDashboard() {
         `${userServiceUrl}/api/v1/orders/verify-delivery-otp/`,{orderId:currentOrder._id, shopOrderId:currentOrder.shopOrder._id, otp},
         { withCredentials: true }
       );
+      navigate('/')
     } catch (error) {
       console.log(error)
     }
@@ -88,9 +120,9 @@ function DeliveryDashboard() {
 
       <p className="text-[#ff4d2d] mt-1">
         <span className="font-semibold">Latitude: </span>
-        {userData.data.location.coordinates[0]},
+        {deliveryBoyLocation?.lat},
         <span className="font-semibold ml-1">Longitude:</span>{" "}
-        {userData.data.location.coordinates[1]}
+        {deliveryBoyLocation?.lon}
       </p>
     </div>
 
@@ -100,7 +132,7 @@ function DeliveryDashboard() {
         <h1 className="text-lg font-bold mb-4">Available Orders</h1>
 
         <div className="space-y-4">
-          {availableAssignments.length > 0 ? (
+          {availableAssignments?.length > 0 ? (
             availableAssignments.map((a, index) => (
               <div
                 key={index}
@@ -156,7 +188,16 @@ function DeliveryDashboard() {
         </div>
 
         {/* LIVE TRACKING MAP */}
-        <DeliveryTracking data={currentOrder} />
+        <DeliveryTracking data={{
+          deliveryBoyLocation: deliveryBoyLocation || {
+                      lat: userData?.data.location?.coordinates?.[0],
+                      lon: userData?.data.location?.coordinates?.[1],
+                    },
+                    customerLocation: {
+                      lat: currentOrder.deliveryAddress?.latitude,
+                      lon: currentOrder.deliveryAddress?.longitude,
+                    },
+        }} />
 
         {/* DELIVERY OTP BOX */}
         {!showOtpBox ? (
